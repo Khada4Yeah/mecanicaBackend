@@ -1,0 +1,5 @@
+{
+    "parser": "php",
+    "plugins": ["@prettier/plugin-php"],
+    "phpVersion": "8.2"
+}
