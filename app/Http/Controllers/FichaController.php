@@ -16,7 +16,8 @@ class FichaController extends Controller
      */
     public function index()
     {
-        //
+        $fichas = Ficha::with("cliente.usuario", "vehiculo")->get();
+        return response()->json($fichas, 200);
     }
 
     /**
@@ -24,12 +25,12 @@ class FichaController extends Controller
      */
     public function store(Request $request)
     {
-        $ficha_request = json_decode($request->input("ficha", null), true);
+        $ficha_request = $request->input("ficha", []);
 
-        $reparaciones_request = json_decode(
-            $request->input("reparaciones", null),
-            true,
-        );
+        $reparaciones_request = $request->input("reparaciones", []);
+
+        print_r($reparaciones_request);
+        die();
 
         if (!empty($ficha_request) && !empty($reparaciones_request)) {
             // LIMPIAR DATOS
@@ -146,9 +147,8 @@ class FichaController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Ficha $ficha)
+    public function show(string $parametro)
     {
-        //
     }
 
     /**
@@ -165,6 +165,26 @@ class FichaController extends Controller
     public function destroy(Ficha $ficha)
     {
         //
+    }
+
+    /**
+     * Consulta las fichas de un cliente.
+     */
+    public function fichasCliente(string $parametro)
+    {
+        // Realiza la búsqueda condicional
+        $fichas = Ficha::with("cliente.usuario", "vehiculo")
+            ->whereHas("cliente.usuario", function ($q) use ($parametro) {
+                $q->where("cedula", $parametro);
+            })
+            ->orWhereHas("vehiculo", function ($q) use ($parametro) {
+                $q->where("placa", $parametro);
+            })
+            ->orderBy("fecha", "desc")
+            ->get();
+
+        // Retorna los resultados como JSON
+        return response()->json($fichas, 200);
     }
 
     /**

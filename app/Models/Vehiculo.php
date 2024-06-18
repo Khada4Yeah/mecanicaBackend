@@ -21,4 +21,18 @@ class Vehiculo extends Model
         "motor",
         "id_cliente",
     ];
+
+    public function cliente()
+    {
+        return $this->belongsTo(Cliente::class, "id_cliente", "id_cliente");
+    }
+
+    public function fichas()
+    {
+        return $this->hasMany(
+            FichaReparacion::class,
+            "id_vehiculo",
+            "id_vehiculo",
+        );
+    }
 }

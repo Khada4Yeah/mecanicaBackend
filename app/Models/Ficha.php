@@ -20,4 +20,24 @@ class Ficha extends Model
         "id_cliente",
         "id_vehiculo",
     ];
+
+    public function cliente()
+    {
+        return $this->belongsTo(Cliente::class, "id_cliente", "id_cliente");
+    }
+
+    public function vehiculo()
+    {
+        return $this->belongsTo(Vehiculo::class, "id_vehiculo", "id_vehiculo");
+    }
+
+    public function reparaciones()
+    {
+        return $this->belongsToMany(
+            Reparacion::class,
+            "fichas_reparaciones",
+            "id_ficha",
+            "id_reparacion",
+        )->withPivot("informacion_adicional");
+    }
 }

@@ -15,7 +15,8 @@ class ReparacionController extends Controller
      */
     public function index()
     {
-        //
+        $reparaciones = Reparacion::all();
+        return response()->json($reparaciones, 200);
     }
 
     /**

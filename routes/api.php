@@ -29,6 +29,12 @@ Route::apiResource("reparaciones", ReparacionController::class);
 //** API de fichas */
 Route::apiResource("fichas", FichaController::class);
 
+//** RUTA para obtener las fichas de un cliente */
+Route::get("fichas/cliente/{parametro}", [
+    FichaController::class,
+    "fichasCliente",
+]);
+
 //?? RUTAS DE FICHASREPARACIONES ?/
 //** API de fichasreparaciones */
 Route::apiResource("fichasreparaciones", FichaReparacionController::class);

@@ -14,4 +14,14 @@ class Reparacion extends Model
     public $timestamps = false;
 
     protected $fillable = ["tipo_reparacion"];
+
+    public function fichas()
+    {
+        return $this->belongsToMany(
+            Ficha::class,
+            "fichas_reparaciones",
+            "id_reparacion",
+            "id_ficha",
+        )->withPivot("informacion_adicional");
+    }
 }

@@ -15,7 +15,8 @@ class VehiculoController extends Controller
      */
     public function index()
     {
-        //
+        $vehiculos = Vehiculo::with("cliente", "cliente.usuario")->get();
+        return response()->json($vehiculos);
     }
 
     /**
@@ -24,8 +25,7 @@ class VehiculoController extends Controller
     public function store(Request $request)
     {
         // RECOGER LOS DATOS POR POST
-        $json = $request->input("json", null);
-        $params_array = json_decode($json, true);
+        $params_array = $request->json()->all();
 
         if (!empty($params_array)) {
             // LIMPIAR DATOS
@@ -38,7 +38,7 @@ class VehiculoController extends Controller
                 "modelo" => "required",
                 "chasis" => "required",
                 "motor" => "required",
-                "id_cliente" => "required",
+                "id_cliente" => "required|integer",
             ]);
 
             if ($validar_datos->fails()) {
@@ -77,7 +77,7 @@ class VehiculoController extends Controller
                             "status" => "success",
                             "message" => "Datos guardados correctamente",
                         ],
-                        200,
+                        201,
                     );
                 } catch (\Throwable $th) {
                     DB::rollBack();
