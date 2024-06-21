@@ -21,6 +21,12 @@ Route::apiResource("clientes", ClienteController::class);
 //** API de vehiculos */
 Route::apiResource("vehiculos", VehiculoController::class);
 
+//** Ruta para obtener los vehiculos de un cliente */
+Route::get("vehiculos/cliente/{parametro}", [
+    VehiculoController::class,
+    "vehiculosCliente",
+]);
+
 //?? RUTAS DE REPARACIONES ?/
 //** API de reparaciones */
 Route::apiResource("reparaciones", ReparacionController::class);
@@ -29,11 +35,14 @@ Route::apiResource("reparaciones", ReparacionController::class);
 //** API de fichas */
 Route::apiResource("fichas", FichaController::class);
 
-//** RUTA para obtener las fichas de un cliente */
+//** Ruta para obtener las fichas de un cliente */
 Route::get("fichas/cliente/{parametro}", [
     FichaController::class,
     "fichasCliente",
 ]);
+
+//** Ruta para generar el PDF de la ficha */
+Route::get("fichas/pdf/{id}", [FichaController::class, "generarPdfFicha"]);
 
 //?? RUTAS DE FICHASREPARACIONES ?/
 //** API de fichasreparaciones */

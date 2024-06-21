@@ -38,6 +38,8 @@ class Ficha extends Model
             "fichas_reparaciones",
             "id_ficha",
             "id_reparacion",
-        )->withPivot("informacion_adicional");
+        )
+            ->using(FichaReparacion::class)
+            ->withPivot("informacion_adicional");
     }
 }

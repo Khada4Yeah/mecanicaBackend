@@ -34,7 +34,7 @@ class ClienteController extends Controller
 
             // VALIDAR DATOS
             $validar_datos = Validator::make($params_array, [
-                "cedula" => "required",
+                "cedula" => "required|unique:usuarios,cedula",
                 "nombres" => "required",
                 "celular" => "required",
                 "correo_electronico" => "required|email",

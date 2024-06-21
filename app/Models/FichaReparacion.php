@@ -4,8 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
-class FichaReparacion extends Model
+class FichaReparacion extends Pivot
 {
     use HasFactory;
 
@@ -18,6 +19,11 @@ class FichaReparacion extends Model
         "id_ficha",
         "id_reparacion",
         "informacion_adicional",
+    ];
+
+    // Indicar que el campo 'informacion_adicional' debe ser tratado como JSON
+    protected $casts = [
+        "informacion_adicional" => "array",
     ];
 
     // Sobrescribir la propiedad primaryKey para manejar la clave compuesta

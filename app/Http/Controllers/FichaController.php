@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Ficha;
 use App\Models\FichaReparacion;
-
+use App\Models\Reparacion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+
+use Barryvdh\Snappy\Facades\SnappyPdf as PDF;
 
 class FichaController extends Controller
 {
@@ -26,11 +28,7 @@ class FichaController extends Controller
     public function store(Request $request)
     {
         $ficha_request = $request->input("ficha", []);
-
         $reparaciones_request = $request->input("reparaciones", []);
-
-        print_r($reparaciones_request);
-        die();
 
         if (!empty($ficha_request) && !empty($reparaciones_request)) {
             // LIMPIAR DATOS
@@ -39,8 +37,8 @@ class FichaController extends Controller
 
             // VALIDAR DATOS DE LA FICHA
             $validar_ficha = Validator::make($ficha_request, [
-                "id_cliente" => "required",
-                "id_vehiculo" => "required",
+                "id_cliente" => "required | integer",
+                "id_vehiculo" => "required | integer",
             ]);
 
             if ($validar_ficha->fails()) {
@@ -56,10 +54,10 @@ class FichaController extends Controller
             }
 
             // VALIDAR DATOS DE LAS REPARACIONES
-
             $informacion_adicional =
-                $params_array["informacion_adicional"] ?? [];
-            $tipo_reparacion = $params_array["tipo_reparacion"] ?? null;
+                $reparaciones_request["informacion_adicional"] ?? [];
+            $tipo_reparacion = $reparaciones_request["id_reparacion"] ?? null;
+
             if ($tipo_reparacion) {
                 $validar_info_adicional = $this->validateInformacionAdicional(
                     $informacion_adicional,
@@ -86,7 +84,7 @@ class FichaController extends Controller
                 $ficha = new Ficha();
                 $ficha->numero_ficha = 0;
                 $ficha->fecha = date("Y-m-d");
-                $ficha->otros = $ficha_request["otros"];
+                $ficha->otros = $ficha_request["otros"] ?? null;
                 $ficha->id_cliente = $ficha_request["id_cliente"];
                 $ficha->id_vehiculo = $ficha_request["id_vehiculo"];
 
@@ -101,11 +99,10 @@ class FichaController extends Controller
                     $ficha_reparacion = new FichaReparacion();
                     $ficha_reparacion->id_ficha = $id_ficha;
                     $ficha_reparacion->id_reparacion =
-                        $reparacion["tipo_reparacion"];
+                        $reparacion["id_reparacion"];
                     if ($reparacion["informacion_adicional"] !== null) {
-                        $ficha_reparacion->informacion_adicional = json_encode(
-                            $reparacion["informacion_adicional"],
-                        );
+                        $ficha_reparacion->informacion_adicional =
+                            $reparacion["informacion_adicional"];
                     } else {
                         $ficha_reparacion->informacion_adicional = null;
                     }
@@ -149,6 +146,11 @@ class FichaController extends Controller
      */
     public function show(string $parametro)
     {
+        //Consultar las fichas con el cliente, datos de usuario, vehiculo y las reparaciones
+        $ficha = Ficha::with("cliente.usuario", "vehiculo", "reparaciones")
+            ->where("id_ficha", $parametro)
+            ->first();
+        return response()->json($ficha, 200);
     }
 
     /**
@@ -168,7 +170,7 @@ class FichaController extends Controller
     }
 
     /**
-     * Consulta las fichas de un cliente.
+     * Consultar las fichas de un cliente.
      */
     public function fichasCliente(string $parametro)
     {
@@ -185,6 +187,39 @@ class FichaController extends Controller
 
         // Retorna los resultados como JSON
         return response()->json($fichas, 200);
+    }
+
+    /**
+     * Generar ficha de reparación.
+     */
+    public function generarPdfFicha(string $id_ficha)
+    {
+        // return view("ficha", compact("id_ficha"));
+
+        $datos_ficha = Ficha::with(
+            "cliente.usuario",
+            "vehiculo",
+            "reparaciones",
+        )
+            ->where("id_ficha", $id_ficha)
+            ->first();
+
+        $datos_ficha = $datos_ficha->toArray();
+
+        $cliente = $datos_ficha["cliente"]["usuario"];
+        $vehiculo = $datos_ficha["vehiculo"];
+        $reparaciones = $datos_ficha["reparaciones"];
+        $rp = Reparacion::all()->toArray();
+
+        // var_dump($reparaciones);
+        // die();
+
+        $pdf = PDF::loadView(
+            "ficha",
+            compact("datos_ficha", "cliente", "vehiculo", "reparaciones", "rp"),
+        );
+        $pdf->setOption("enable-local-file-access", true);
+        return $pdf->inline("invoice.pdf");
     }
 
     /**

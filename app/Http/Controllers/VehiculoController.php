@@ -126,4 +126,13 @@ class VehiculoController extends Controller
     {
         //
     }
+
+    /**
+     * Obtener los vehiculos de un cliente
+     */
+    public function vehiculosCliente(int $id_cliente)
+    {
+        $vehiculos = Vehiculo::where("id_cliente", $id_cliente)->get();
+        return response()->json($vehiculos);
+    }
 }
