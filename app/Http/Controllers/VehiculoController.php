@@ -31,15 +31,32 @@ class VehiculoController extends Controller
             // LIMPIAR DATOS
             $params_array = array_map("trim", $params_array);
 
+            $mensajes = [
+                "placa.required" => "La placa es requerida",
+                "placa.size" =>
+                    "La placa debe tener 8 caracteres, incluido el guión",
+                "placa.unique" => "La placa ya está registrada",
+                "marca.required" => "La marca es requerida",
+                "modelo.required" => "El modelo es requerido",
+                "chasis.required" => "El chasis es requerido",
+                "motor.required" => "El motor es requerido",
+                "id_cliente.required" => "El cliente es requerido",
+                "id_cliente.exists" => "El cliente no existe",
+            ];
+
             // VALIDAR DATOS
-            $validar_datos = Validator::make($params_array, [
-                "placa" => "required",
-                "marca" => "required",
-                "modelo" => "required",
-                "chasis" => "required",
-                "motor" => "required",
-                "id_cliente" => "required|integer",
-            ]);
+            $validar_datos = Validator::make(
+                $params_array,
+                [
+                    "placa" => "required|size:8",
+                    "marca" => "required",
+                    "modelo" => "required",
+                    "chasis" => "required",
+                    "motor" => "required",
+                    "id_cliente" => "required|exists:clientes,id_cliente",
+                ],
+                $mensajes,
+            );
 
             if ($validar_datos->fails()) {
                 // LA VALIDACION HA FALLADO

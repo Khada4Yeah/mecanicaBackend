@@ -8,7 +8,7 @@
     <title>Ficha</title>
     <style>
         @page {
-            size: landscape;
+            size: A4;
             margin: 1cm;
         }
 
@@ -39,24 +39,49 @@
 
         .header-cell img {
             position: absolute;
-            left: 1%;
-            top: 30%;
             transform: translateY(-50%);
+            padding: 0;
+            margin: 0
         }
 
         .header-cell h1 {
             margin: 1;
             display: inline-block;
         }
+
+        /* Estilo para la marca de agua */
+        .watermark {
+            position: absolute;
+            top: 30%;
+            left: 15%;
+            transform: translate(-50%, -50%);
+            opacity: 0.4;
+            pointer-events: none;
+            /* Evita la interacción con otros elementos */
+            z-index: -1;
+            /* Coloca la marca de agua detrás del contenido */
+            width: 70%;
+            height: 70%;
+        }
+
+        .watermark img {
+            opacity: 0.5;
+            /* Opacidad del 10% */
+            width: 100%;
+            height: 100%;
+        }
     </style>
 </head>
 
 <body>
+    <div class="watermark">
+        <img src="{{ public_path('images/logo_2.png') }}" alt="Marca de Agua">
+    </div>
     <table>
         <thead>
             <tr>
                 <th colspan="3" class="header-cell">
-                    <img src="{{ public_path('images/logo.png') }}" alt="Logo" width="135" height="45">
+                    <img src="{{ public_path('images/logo_2.png') }}" alt="Logo" width="145" height="90">
                     <h1>Mécanica Automotríz Espinoza</h1>
                 </th>
             </tr>
@@ -68,7 +93,7 @@
                 </td>
             </tr>
             <tr>
-                <td><b>Ficha N° {{ $datos_ficha['id_ficha'] }}</b></td>
+                <td><b>Ficha N° {{ $datos_ficha['numero_ficha'] }}</b></td>
                 <td colspan="2"><b>Fecha de mantenimiento:</b> {{ $datos_ficha['fecha'] }}</td>
             </tr>
             <tr>

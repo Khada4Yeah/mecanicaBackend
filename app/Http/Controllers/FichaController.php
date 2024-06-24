@@ -35,11 +35,22 @@ class FichaController extends Controller
             $ficha_request = array_map("trim", $ficha_request);
             //$reparaciones_request = array_map("trim", $reparaciones_request);
 
+            $mensajes = [
+                "id_cliente.required" => "El cliente es requerido",
+                "id_cliente.exists" => "El cliente no existe",
+                "id_vehiculo.required" => "El vehículo es requerido",
+                "id_vehiculo.exists" => "El vehículo no existe",
+            ];
+
             // VALIDAR DATOS DE LA FICHA
-            $validar_ficha = Validator::make($ficha_request, [
-                "id_cliente" => "required | integer",
-                "id_vehiculo" => "required | integer",
-            ]);
+            $validar_ficha = Validator::make(
+                $ficha_request,
+                [
+                    "id_cliente" => "required|exists:clientes,id_cliente",
+                    "id_vehiculo" => "required|exists:vehiculos,id_vehiculo",
+                ],
+                $mensajes,
+            );
 
             if ($validar_ficha->fails()) {
                 // LA VALIDACION DE LA FICHA HA FALLADO
@@ -211,6 +222,10 @@ class FichaController extends Controller
         $reparaciones = $datos_ficha["reparaciones"];
         $rp = Reparacion::all()->toArray();
 
+        return view(
+            "ficha",
+            compact("datos_ficha", "cliente", "vehiculo", "reparaciones", "rp"),
+        );
         // var_dump($reparaciones);
         // die();
 
@@ -229,51 +244,42 @@ class FichaController extends Controller
         $informacion_adicional,
         $tipo_reparacion,
     ) {
-        $rules = [];
         switch ($tipo_reparacion) {
-            // Caso 1: Cambio de bujías
-            case 4:
+            // Casos que utilizan las mismas reglas de kilometraje
+            case 4: // Cambio de bujías
+            case 9: // Cambio de kit de banda de distribución
+            case 13: // Cambio de aceite de motor
+            case 14: // Cambio de aceite de caja de cambios
+            case 15: // Cambio de aceite del diferencial
                 $rules = [
                     "kilometraje_actual" => "required|integer",
                     "kilometraje_siguiente" => "required|integer",
                 ];
                 break;
-            // Caso 2: Cambio de kit de banda de distribución
-            case 9:
-                $rules = [
-                    "kilometraje_actual" => "required|integer",
-                    "kilometraje_siguiente" => "required|integer",
-                ];
-                break;
-            // Caso 3: Cambio de aceite de motor
-            case 13:
-                $rules = [
-                    "kilometraje_actual" => "required|integer",
-                    "kilometraje_siguiente" => "required|integer",
-                ];
-                break;
-            // Caso 4: Cambio de aceite de caja de cambios
-            case 14:
-                $rules = [
-                    "kilometraje_actual" => "required|integer",
-                    "kilometraje_siguiente" => "required|integer",
-                ];
-                break;
-            // Caso 5: Cambio de aceite del diferencial
-            case 15:
-                $rules = [
-                    "kilometraje_actual" => "required|integer",
-                    "kilometraje_siguiente" => "required|integer",
-                ];
-                break;
-            // Caso 6: Cambio de rulimanes de rueda
-            case 23:
+
+            // Caso específico con reglas diferentes
+            case 23: // Cambio de rulimanes de rueda
                 $rules = [
                     "ruedas" => "required|array",
                     "ruedas.*" => "in:DI, DD, TI, TD",
                 ];
                 break;
         }
-        return Validator::make($informacion_adicional, $rules);
+
+        $mensajes = [
+            "kilometraje_actual.required" =>
+                "El kilometraje actual es requerido",
+            "kilometraje_actual.integer" =>
+                "El kilometraje actual debe ser un número entero",
+            "kilometraje_siguiente.required" =>
+                "El kilometraje siguiente es requerido",
+            "kilometraje_siguiente.integer" =>
+                "El kilometraje siguiente debe ser un número entero",
+            "ruedas.required" => "Las ruedas son requeridas",
+            "ruedas.*.in" =>
+                "Las ruedas deben ser DI, DD, TI o TD (delantera izquierda, delantera derecha, trasera izquierda, trasera derecha)",
+        ];
+
+        return Validator::make($informacion_adicional, $rules, $mensajes);
     }
 }

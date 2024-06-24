@@ -33,9 +33,16 @@ class ReparacionController extends Controller
             $params_array = array_map("trim", $params_array);
 
             // VALIDAR DATOS
-            $validar_datos = Validator::make($params_array, [
-                "tipo_reparacion" => "required",
-            ]);
+            $validar_datos = Validator::make(
+                $params_array,
+                [
+                    "tipo_reparacion" => "required",
+                ],
+                [
+                    "tipo_reparacion.required" =>
+                        "El tipo de reparación es requerido",
+                ],
+            );
 
             if ($validar_datos->fails()) {
                 // LA VALIDACION HA FALLADO

@@ -28,17 +28,33 @@ class ClienteController extends Controller
         // RECOGER LOS DATOS POR POST
         $params_array = $request->json()->all();
 
+        $mensajes = [
+            "cedula.required" => "La cédula es requerida",
+            "cedula.unique" => "La cédula ya está registrada",
+            "cedula.size" => "La cédula debe tener 10 dígitos",
+            "nombres.required" => "El nombre es requerido",
+            "celular.required" => "El celular es requerido",
+            "celular.size" => "El celular debe tener 10 dígitos",
+            "correo_electronico.required" =>
+                "El correo electrónico es requerido",
+            "correo_electronico.email" => "El correo electrónico no es válido",
+        ];
+
         if (!empty($params_array)) {
             // LIMPIAR DATOS
             $params_array = array_map("trim", $params_array);
 
             // VALIDAR DATOS
-            $validar_datos = Validator::make($params_array, [
-                "cedula" => "required|unique:usuarios,cedula",
-                "nombres" => "required",
-                "celular" => "required",
-                "correo_electronico" => "required|email",
-            ]);
+            $validar_datos = Validator::make(
+                $params_array,
+                [
+                    "cedula" => "required|unique:usuarios,cedula|size:10",
+                    "nombres" => "required",
+                    "celular" => "required|size:10",
+                    "correo_electronico" => "required|email",
+                ],
+                $mensajes,
+            );
 
             if ($validar_datos->fails()) {
                 // LA VALIDACION HA FALLADO
