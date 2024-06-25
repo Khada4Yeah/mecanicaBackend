@@ -6,12 +6,24 @@ use App\Http\Controllers\VehiculoController;
 use App\Http\Controllers\FichaController;
 use App\Http\Controllers\FichaReparacionController;
 use App\Http\Controllers\ClienteController;
-
+use App\Http\Controllers\AdministradorController;
+use App\Models\Administrador;
 use Illuminate\Support\Facades\Route;
 
 //?? RUTAS DE USUARIOS ?/
 //** API de usuarios */
 Route::apiResource("usuarios", UsuarioController::class);
+
+//?? RUTAS DE ADMINISTRADORES ?/
+//** Ruta para logearse en el sistema */
+Route::post("administradores/login", [AdministradorController::class, "login"]);
+Route::get("administradores/validarToken", [
+    AdministradorController::class,
+    "getAuthenticatedUser",
+]);
+
+//** API de administradores */
+Route::apiResource("administradores", AdministradorController::class);
 
 //?? RUTAS DE CLIENTES ?/
 //** API de clientes */
