@@ -205,8 +205,6 @@ class FichaController extends Controller
      */
     public function generarPdfFicha(string $id_ficha)
     {
-        // return view("ficha", compact("id_ficha"));
-
         $datos_ficha = Ficha::with(
             "cliente.usuario",
             "vehiculo",
@@ -222,10 +220,10 @@ class FichaController extends Controller
         $reparaciones = $datos_ficha["reparaciones"];
         $rp = Reparacion::all()->toArray();
 
-        return view(
-            "ficha",
-            compact("datos_ficha", "cliente", "vehiculo", "reparaciones", "rp"),
-        );
+        // return view(
+        //     "ficha",
+        //     compact("datos_ficha", "cliente", "vehiculo", "reparaciones", "rp"),
+        // );
         // var_dump($reparaciones);
         // die();
 

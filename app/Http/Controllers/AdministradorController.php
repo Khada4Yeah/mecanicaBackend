@@ -88,7 +88,6 @@ class AdministradorController extends Controller
                 // LA VALIDACION DE LA FICHA HA FALLADO
                 return response()->json(
                     [
-                        "status" => "error",
                         "message" => "Error al validar los datos",
                         "errors" => $validar_credenciales->errors(),
                     ],
@@ -138,7 +137,6 @@ class AdministradorController extends Controller
                     $token = JWTAuth::fromUser($usuario);
                     return response()->json(
                         [
-                            "status" => "success",
                             "token" => $token,
                         ],
                         200,
@@ -172,7 +170,7 @@ class AdministradorController extends Controller
         }
     }
 
-    public function getAuthenticatedUser()
+    public function obtenerUsuarioAutenticado()
     {
         try {
             if (!($user = JWTAuth::parseToken()->authenticate())) {
@@ -211,5 +209,24 @@ class AdministradorController extends Controller
         }
 
         return response()->json(compact("user"));
+    }
+
+    /**
+     * Log the user out (Invalidate the token).
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function logout()
+    {
+        $token = JWTAuth::getToken();
+        JWTAuth::invalidate($token);
+
+        return response()->json(
+            [
+                "status" => "success",
+                "message" => "Usuario deslogueado correctamente",
+            ],
+            200,
+        );
     }
 }

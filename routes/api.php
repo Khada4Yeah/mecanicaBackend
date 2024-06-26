@@ -17,9 +17,13 @@ Route::apiResource("usuarios", UsuarioController::class);
 //?? RUTAS DE ADMINISTRADORES ?/
 //** Ruta para logearse en el sistema */
 Route::post("administradores/login", [AdministradorController::class, "login"]);
-Route::get("administradores/validarToken", [
+Route::post("administradores/validarToken", [
     AdministradorController::class,
-    "getAuthenticatedUser",
+    "obtenerUsuarioAutenticado",
+]);
+Route::post("administradores/logout", [
+    AdministradorController::class,
+    "logout",
 ]);
 
 //** API de administradores */

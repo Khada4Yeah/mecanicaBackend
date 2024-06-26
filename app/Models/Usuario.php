@@ -17,6 +17,8 @@ class Usuario extends Authenticatable implements JWTSubject
     protected $primaryKey = "id_usuario";
     protected $dateFormat = "Y-m-d\TH:i:s";
 
+    protected $hidden = ["id_usuario"];
+
     protected $fillable = [
         "cedula",
         "apellido_p",
