@@ -32,32 +32,25 @@ return [
     |
     */
 
-    // "pdf" => [
-    //     "enabled" => true,
-    //     "binary" => env(
-    //         "WKHTML_PDF_BINARY",
-    //         '"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf"',
-    //     ),
-    //     "timeout" => false,
-    //     "options" => [],
-    //     "env" => [],
-    // ],
     "pdf" => [
         "enabled" => true,
-        "binary" => env("WKHTML_PDF_BINARY", "wkhtmltopdf"),
+        "binary" => env(
+            "WKHTML_PDF_BINARY",
+            '"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf"',
+        ),
         "timeout" => false,
         "options" => [],
         "env" => [],
     ],
 
-    // "image" => [
-    //     "enabled" => true,
-    //     "binary" => env(
-    //         "WKHTML_IMG_BINARY",
-    //         '"C:\Program Files\wkhtmltopdf\bin\wkhtmltoimage"',
-    //     ),
-    //     "timeout" => false,
-    //     "options" => [],
-    //     "env" => [],
-    // ],
+    "image" => [
+        "enabled" => true,
+        "binary" => env(
+            "WKHTML_IMG_BINARY",
+            '"C:\Program Files\wkhtmltopdf\bin\wkhtmltoimage"',
+        ),
+        "timeout" => false,
+        "options" => [],
+        "env" => [],
+    ],
 ];
