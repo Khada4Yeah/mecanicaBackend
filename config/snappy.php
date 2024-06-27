@@ -32,12 +32,19 @@ return [
     |
     */
 
+    // "pdf" => [
+    //     "enabled" => true,
+    //     "binary" => env(
+    //         "WKHTML_PDF_BINARY",
+    //         '"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf"',
+    //     ),
+    //     "timeout" => false,
+    //     "options" => [],
+    //     "env" => [],
+    // ],
     "pdf" => [
         "enabled" => true,
-        "binary" => env(
-            "WKHTML_PDF_BINARY",
-            '"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf"',
-        ),
+        "binary" => env("WKHTML_PDF_BINARY", "wkhtmltopdf"),
         "timeout" => false,
         "options" => [],
         "env" => [],
