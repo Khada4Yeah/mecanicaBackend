@@ -1,2 +1,4 @@
 wkhtmltopdf
 libpcre2-16
+wkhtmltoimage
+libpcre3
