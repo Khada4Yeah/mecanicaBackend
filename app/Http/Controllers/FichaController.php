@@ -18,8 +18,7 @@ class FichaController extends Controller
      */
     public function index()
     {
-        $fichas = Ficha::with("cliente.usuario", "vehiculo")->get();
-        //dd
+        $fichas = Ficha::with("vehiculo")->get();
         return response()->json($fichas, 200);
     }
 
@@ -37,8 +36,6 @@ class FichaController extends Controller
             //$reparaciones_request = array_map("trim", $reparaciones_request);
 
             $mensajes = [
-                "id_cliente.required" => "El cliente es requerido",
-                "id_cliente.exists" => "El cliente no existe",
                 "id_vehiculo.required" => "El vehículo es requerido",
                 "id_vehiculo.exists" => "El vehículo no existe",
             ];
@@ -47,7 +44,6 @@ class FichaController extends Controller
             $validar_ficha = Validator::make(
                 $ficha_request,
                 [
-                    "id_cliente" => "required|exists:clientes,id_cliente",
                     "id_vehiculo" => "required|exists:vehiculos,id_vehiculo",
                 ],
                 $mensajes,
@@ -97,7 +93,6 @@ class FichaController extends Controller
                 $ficha->numero_ficha = 0;
                 $ficha->fecha = date("Y-m-d");
                 $ficha->otros = $ficha_request["otros"] ?? null;
-                $ficha->id_cliente = $ficha_request["id_cliente"];
                 $ficha->id_vehiculo = $ficha_request["id_vehiculo"];
 
                 // GUARDAR EL USUARIO
@@ -159,7 +154,7 @@ class FichaController extends Controller
     public function show(string $parametro)
     {
         //Consultar las fichas con el cliente, datos de usuario, vehiculo y las reparaciones
-        $ficha = Ficha::with("cliente.usuario", "vehiculo", "reparaciones")
+        $ficha = Ficha::with("vehiculo", "reparaciones")
             ->where("id_ficha", $parametro)
             ->first();
         return response()->json($ficha, 200);
@@ -186,10 +181,25 @@ class FichaController extends Controller
      */
     public function fichasCliente(string $parametro)
     {
-        // Realiza la búsqueda condicional
-        $fichas = Ficha::with("cliente.usuario", "vehiculo")
-            ->whereHas("cliente.usuario", function ($q) use ($parametro) {
-                $q->where("cedula", $parametro);
+        // // Realiza la búsqueda condicional
+        // $fichas = Ficha::with("cliente.usuario", "vehiculo")
+        //     ->whereHas("cliente.usuario", function ($q) use ($parametro) {
+        //         $q->where("cedula", $parametro);
+        //     })
+        //     ->orWhereHas("vehiculo", function ($q) use ($parametro) {
+        //         $q->where("placa", $parametro);
+        //     })
+        //     ->orderBy("fecha", "desc")
+        //     ->get();
+
+        // // Retorna los resultados como JSON
+        // return response()->json($fichas, 200);
+
+        $fichas = Ficha::with("vehiculo.cliente.usuario")
+            ->whereHas("vehiculo.cliente.usuario", function ($query) use (
+                $parametro,
+            ) {
+                $query->where("cedula", $parametro);
             })
             ->orWhereHas("vehiculo", function ($q) use ($parametro) {
                 $q->where("placa", $parametro);
@@ -197,7 +207,29 @@ class FichaController extends Controller
             ->orderBy("fecha", "desc")
             ->get();
 
-        // Retorna los resultados como JSON
+        $fichas = $fichas->map(function ($ficha) {
+            $vehiculo = $ficha->vehiculo;
+            $cliente = $vehiculo->cliente;
+            $usuario = $cliente->usuario;
+
+            // Eliminar el cliente de la relación del vehículo
+            unset($vehiculo->cliente);
+
+            return [
+                "id_ficha" => $ficha->id_ficha,
+                "numero_ficha" => $ficha->numero_ficha,
+                "fecha" => $ficha->fecha,
+                "otros" => $ficha->otros,
+                "id_vehiculo" => $ficha->id_vehiculo,
+                "vehiculo" => $vehiculo,
+                "cliente" => [
+                    "id_cliente" => $cliente->id_cliente,
+                    "id_usuario" => $cliente->id_usuario,
+                    "usuario" => $usuario,
+                ],
+            ];
+        });
+
         return response()->json($fichas, 200);
     }
 
@@ -206,17 +238,13 @@ class FichaController extends Controller
      */
     public function generarPdfFicha(string $id_ficha)
     {
-        $datos_ficha = Ficha::with(
-            "cliente.usuario",
-            "vehiculo",
-            "reparaciones",
-        )
+        $datos_ficha = Ficha::with("vehiculo.cliente.usuario", "reparaciones")
             ->where("id_ficha", $id_ficha)
             ->first();
 
         $datos_ficha = $datos_ficha->toArray();
 
-        $cliente = $datos_ficha["cliente"]["usuario"];
+        $cliente = $datos_ficha["vehiculo"]["cliente"]["usuario"];
         $vehiculo = $datos_ficha["vehiculo"];
         $reparaciones = $datos_ficha["reparaciones"];
         $rp = Reparacion::all()->toArray();
