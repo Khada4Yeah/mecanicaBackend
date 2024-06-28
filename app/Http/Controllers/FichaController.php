@@ -19,6 +19,7 @@ class FichaController extends Controller
     public function index()
     {
         $fichas = Ficha::with("cliente.usuario", "vehiculo")->get();
+        //dd
         return response()->json($fichas, 200);
     }
 
