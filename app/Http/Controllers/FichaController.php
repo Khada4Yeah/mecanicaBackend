@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 use Barryvdh\Snappy\Facades\SnappyPdf as PDF;
+use Carbon\Carbon;
 
 class FichaController extends Controller
 {
@@ -91,7 +92,9 @@ class FichaController extends Controller
                 // CREAR LA FICHA
                 $ficha = new Ficha();
                 $ficha->numero_ficha = 0;
-                $ficha->fecha = date("Y-m-d");
+                $ficha->fecha = empty($ficha_request["fecha"])
+                    ? date("Y-m-d")
+                    : $this->formatearFecha($ficha_request["fecha"]);
                 $ficha->otros = $ficha_request["otros"] ?? null;
                 $ficha->id_vehiculo = $ficha_request["id_vehiculo"];
 
@@ -181,20 +184,6 @@ class FichaController extends Controller
      */
     public function fichasCliente(string $parametro)
     {
-        // // Realiza la búsqueda condicional
-        // $fichas = Ficha::with("cliente.usuario", "vehiculo")
-        //     ->whereHas("cliente.usuario", function ($q) use ($parametro) {
-        //         $q->where("cedula", $parametro);
-        //     })
-        //     ->orWhereHas("vehiculo", function ($q) use ($parametro) {
-        //         $q->where("placa", $parametro);
-        //     })
-        //     ->orderBy("fecha", "desc")
-        //     ->get();
-
-        // // Retorna los resultados como JSON
-        // return response()->json($fichas, 200);
-
         $fichas = Ficha::with("vehiculo.cliente.usuario")
             ->whereHas("vehiculo.cliente.usuario", function ($query) use (
                 $parametro,
@@ -308,5 +297,22 @@ class FichaController extends Controller
         ];
 
         return Validator::make($informacion_adicional, $rules, $mensajes);
+    }
+
+    /**
+     * Formatear fecha.
+     *
+     * @param string $fecha
+     * @return string
+     */
+    private function formatearFecha(string $fecha)
+    {
+        // Crear un objeto Carbon a partir de la cadena de fecha
+        $date = Carbon::parse($fecha);
+
+        // Formatear la fecha en el formato yyyy-MM-dd
+        $formattedDate = $date->format("Y-m-d");
+
+        return $formattedDate;
     }
 }

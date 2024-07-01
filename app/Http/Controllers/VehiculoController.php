@@ -122,10 +122,26 @@ class VehiculoController extends Controller
 
     /**
      * Display the specified resource.
+     * @param  int  $id_vehiculo
+     * @return \Illuminate\Http\Response
      */
-    public function show(Vehiculo $vehiculo)
+    public function show(int $id_vehiculo)
     {
-        //
+        $vehiculo = Vehiculo::with("cliente", "cliente.usuario")->find(
+            $id_vehiculo,
+        );
+
+        if (is_object($vehiculo)) {
+            return response()->json($vehiculo);
+        } else {
+            return response()->json(
+                [
+                    "status" => "error",
+                    "message" => "Vehículo no encontrado",
+                ],
+                404,
+            );
+        }
     }
 
     /**
