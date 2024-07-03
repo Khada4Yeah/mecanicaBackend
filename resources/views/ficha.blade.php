@@ -31,22 +31,26 @@
             text-align: left;
         }
 
-        .header-cell {
-            position: relative;
-            text-align: center;
-            font-size: 18px;
-        }
+        /* centar verticalmente la imagen en la fila header y enviarla a la izquierda, el texto que esta a la izquierda debe estar centrado
+        horizontalmente y verticalmente*/
+        .header-cell {}
 
         .header-cell img {
-            position: absolute;
-            padding: 0;
-            margin: 0
+            float: left;
         }
 
         .header-cell h1 {
-            margin: 1;
-            display: inline-block;
+            text-align: center;
+            vertical-align: middle;
+            line-height: 90px;
+            margin: 0 2.45cm 0 0;
         }
+
+        /* .header-text {
+            font-size: 28pt;
+            text-align: center;
+            vertical-align: middle;
+        } */
 
         .watermark {
             position: absolute;
@@ -143,19 +147,21 @@
 
                     <td>
                         @foreach ($reparaciones as $re)
-                            @if (
-                                $r['id_reparacion'] === $re['id_reparacion'] &&
-                                    ($re['id_reparacion'] === 4 ||
-                                        $re['id_reparacion'] === 9 ||
-                                        $re['id_reparacion'] === 13 ||
-                                        $re['id_reparacion'] === 14 ||
-                                        $re['id_reparacion'] === 15))
-                                Kilometraje Actual:
-                                {{ $re['pivot']['informacion_adicional']['kilometraje_actual'] . ' - Kilometraje Sig.:' . $re['pivot']['informacion_adicional']['kilometraje_actual'] }}
-                            @elseif ($r['id_reparacion'] === $re['id_reparacion'] && $re['id_reparacion'] === 23)
-                                @foreach ($re['pivot']['informacion_adicional']['ruedas'] as $rueda)
-                                    {{ $rueda . ' ' }}
-                                @endforeach
+                            @if ($r['id_reparacion'] === $re['id_reparacion'])
+                                @if (in_array($re['id_reparacion'], [4, 9, 13, 14, 15]))
+                                    Kilometraje Actual:
+                                    {{ $re['pivot']['informacion_adicional']['kilometraje_actual'] }} - Kilometraje
+                                    Sig.:
+                                    {{ $re['pivot']['informacion_adicional']['kilometraje_siguiente'] }}
+                                @elseif ($re['id_reparacion'] === 23)
+                                    @foreach ($re['pivot']['informacion_adicional']['ruedas'] as $rueda)
+                                        {{ $rueda . ' ' }}
+                                    @endforeach
+                                @elseif (in_array($re['id_reparacion'], [24, 25, 26]))
+                                    @foreach ($re['pivot']['informacion_adicional']['zona'] as $zona)
+                                        {{ $zona . ' ' }}
+                                    @endforeach
+                                @endif
                             @endif
                         @endforeach
                     </td>
@@ -170,7 +176,7 @@
 
             <tr>
                 @if ($datos_ficha['otros'] != null)
-                    <td colspan="3">{{ $datos_ficha['otros'] }}</td>
+                    <td colspan="3" style="white-space: pre-line;">{{ $datos_ficha['otros'] }}</td>
                 @else
                     <td colspan="3">Sin observaciones...</td>
                 @endif

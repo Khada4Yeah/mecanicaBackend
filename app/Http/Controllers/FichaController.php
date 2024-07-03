@@ -193,6 +193,16 @@ class FichaController extends Controller
             ->orWhereHas("vehiculo", function ($q) use ($parametro) {
                 $q->where("placa", $parametro);
             })
+            ->orWhereHas("vehiculo.cliente.usuario", function ($q) use (
+                $parametro,
+            ) {
+                $q->where("apellido_p", "like", "%$parametro%");
+            })
+            ->orWhereHas("vehiculo.cliente.usuario", function ($q) use (
+                $parametro,
+            ) {
+                $q->where("apellido_m", "like", "%$parametro%");
+            })
             ->orderBy("fecha", "desc")
             ->get();
 
@@ -280,6 +290,14 @@ class FichaController extends Controller
                     "ruedas.*" => "in:DI, DD, TI, TD",
                 ];
                 break;
+            case 24: // Cambio de pastillas de freno
+            case 25: // Limpieza de mordazas de freno
+            case 26: // Cambio de amortiguadores
+                $rules = [
+                    "zona" => "required|array",
+                    "zona.*" => "in:FRENTE, POSTERIOR",
+                ];
+                break;
         }
 
         $mensajes = [
@@ -294,6 +312,8 @@ class FichaController extends Controller
             "ruedas.required" => "Las ruedas son requeridas",
             "ruedas.*.in" =>
                 "Las ruedas deben ser DI, DD, TI o TD (delantera izquierda, delantera derecha, trasera izquierda, trasera derecha)",
+            "zona.required" => "La zona es requerida",
+            "zona.*.in" => "La zona debe ser FRENTE o POSTERIOR",
         ];
 
         return Validator::make($informacion_adicional, $rules, $mensajes);

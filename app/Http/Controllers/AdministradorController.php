@@ -138,6 +138,7 @@ class AdministradorController extends Controller
                     return response()->json(
                         [
                             "token" => $token,
+                            "expires_in" => JWTAuth::factory()->getTTL() * 60,
                         ],
                         200,
                     );
