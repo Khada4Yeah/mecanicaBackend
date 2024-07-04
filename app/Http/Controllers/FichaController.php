@@ -203,7 +203,7 @@ class FichaController extends Controller
             ) {
                 $q->where("apellido_m", "like", "%$parametro%");
             })
-            ->orderBy("fecha", "desc")
+            ->orderBy("fecha", "ASC")
             ->get();
 
         $fichas = $fichas->map(function ($ficha) {

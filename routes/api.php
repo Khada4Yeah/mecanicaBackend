@@ -72,10 +72,7 @@ Route::get("fichas/cliente/{parametro}", [
 ])->middleware("auth:api");
 
 //** Ruta para generar el PDF de la ficha */
-Route::get("fichas/pdf/{id}", [
-    FichaController::class,
-    "generarPdfFicha",
-])->middleware("auth:api");
+Route::get("fichas/pdf/{id}", [FichaController::class, "generarPdfFicha"]);
 
 //?? RUTAS DE FICHASREPARACIONES ?/
 //** API de fichasreparaciones */
