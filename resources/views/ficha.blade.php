@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Ficha</title>
+    <title>Ficha PDF</title>
     <style>
         @page {
             size: A4;
@@ -145,11 +145,11 @@
                 <td colspan="3">
                     <div class="bloque-linea">
                         <b>Marca:</b>
-                        <div style="display: inline-block; margin-left: 22px">{{ $vehiculo['marca'] }}</div>
+                        <div style="display: inline-block; margin-left: 20px">{{ $vehiculo['marca'] }}</div>
                     </div>
                     <div style="display: inline-block">
                         <b>Motor:</b>
-                        <div style="display: inline-block; margin-left: 5px">
+                        <div style="display: inline-block; margin-left: 6px">
                             {{ $vehiculo['motor'] }}
                         </div>
                     </div>
@@ -169,46 +169,56 @@
                 </td>
             </tr>
 
-            @foreach ($rp as $r)
-                <tr>
-                    <td style="width: 55%">{{ $r['tipo_reparacion'] }}</td>
-                    <td style="text-align: center">
-                        @foreach ($reparaciones as $re)
-                            @if ($r['id_reparacion'] === $re['id_reparacion'])
-                                <b>X</b>
-                            @endif
-                        @endforeach
-                    </td>
-                    <td>
-                        @foreach ($reparaciones as $re)
-                            @if ($r['id_reparacion'] === $re['id_reparacion'])
-                                @if (in_array($re['id_reparacion'], [4, 9, 13, 14, 15]))
-                                    Km. Actual:
-                                    {{ $re['pivot']['informacion_adicional']['kilometraje_actual'] }} - Km.
-                                    Sig.:
-                                    {{ $re['pivot']['informacion_adicional']['kilometraje_siguiente'] }}
-                                @elseif ($re['id_reparacion'] === 23)
-                                    @foreach ($re['pivot']['informacion_adicional']['ruedas'] as $rueda)
-                                        {{ $rueda . ' ' }}
-                                    @endforeach
-                                @elseif (in_array($re['id_reparacion'], [24, 25, 26]))
-                                    @foreach ($re['pivot']['informacion_adicional']['zona'] as $zona)
-                                        {{ $zona . ' ' }}
-                                    @endforeach
+            @if (count($reparaciones) !== 0)
+                @foreach ($rp as $r)
+                    <tr>
+                        <td style="width: 55%">{{ $r['tipo_reparacion'] }}</td>
+                        <td style="text-align: center">
+                            @foreach ($reparaciones as $re)
+                                @if ($r['id_reparacion'] === $re['id_reparacion'])
+                                    <b>X</b>
                                 @endif
-                            @endif
-                        @endforeach
-                    </td>
-                </tr>
-            @endforeach
+                            @endforeach
+                        </td>
+                        <td>
+                            @foreach ($reparaciones as $re)
+                                @if ($r['id_reparacion'] === $re['id_reparacion'])
+                                    @if (in_array($re['id_reparacion'], [4, 9, 13, 14, 15]))
+                                        Km. Actual:
+                                        {{ $re['pivot']['informacion_adicional']['kilometraje_actual'] }} - Km.
+                                        Sig.:
+                                        {{ $re['pivot']['informacion_adicional']['kilometraje_siguiente'] }}
+                                    @elseif ($re['id_reparacion'] === 23)
+                                        @foreach ($re['pivot']['informacion_adicional']['ruedas'] as $rueda)
+                                            {{ $rueda . ' ' }}
+                                        @endforeach
+                                    @elseif (in_array($re['id_reparacion'], [24, 25, 26]))
+                                        @foreach ($re['pivot']['informacion_adicional']['zona'] as $zona)
+                                            {{ $zona . ' ' }}
+                                        @endforeach
+                                    @endif
+                                @endif
+                            @endforeach
+                        </td>
+                    </tr>
+                @endforeach
 
-            <!-- Add empty rows here to create space before Observations -->
-            <tr>
-                <td colspan="3" style="border:none;">&nbsp;</td>
-            </tr>
-            <tr>
-                <td colspan="3" style="border:none;">&nbsp;</td>
-            </tr>
+                <!-- Add empty rows here to create space before Observations -->
+                <tr>
+                    <td colspan="3" style="border:none;">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td colspan="3" style="border:none;">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td colspan="3" style="border:none;">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td colspan="3" style="border:none;">&nbsp;</td>
+                </tr>
+            @endif
+
+
 
             <tr>
                 <td class="fila-subtitulo no-border" colspan="3">

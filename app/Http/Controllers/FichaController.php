@@ -31,7 +31,10 @@ class FichaController extends Controller
         $ficha_request = $request->input("ficha", []);
         $reparaciones_request = $request->input("reparaciones", []);
 
-        if (!empty($ficha_request) && !empty($reparaciones_request)) {
+        if (
+            !empty($ficha_request) &&
+            (!empty($reparaciones_request) || $ficha_request["otros"] !== null)
+        ) {
             // LIMPIAR DATOS
             $ficha_request = array_map("trim", $ficha_request);
             //$reparaciones_request = array_map("trim", $reparaciones_request);
@@ -258,9 +261,11 @@ class FichaController extends Controller
         $pdf = PDF::loadView(
             "ficha",
             compact("datos_ficha", "cliente", "vehiculo", "reparaciones", "rp"),
-        );
+        )->setPaper("a4");
         $pdf->setOption("enable-local-file-access", true);
         return $pdf->inline("invoice.pdf");
+
+        return $pdf->download("filename.pdf");
     }
 
     /**
