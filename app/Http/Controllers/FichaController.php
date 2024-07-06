@@ -257,7 +257,7 @@ class FichaController extends Controller
         $pdf = PDF::setOptions([
             "enable-local-file-access" => true,
         ])->loadView(
-            "ficha",
+            "ficha2",
             compact("datos_ficha", "cliente", "vehiculo", "reparaciones", "rp"),
         );
 
