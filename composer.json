@@ -7,9 +7,13 @@
     "require": {
         "php": "^8.2",
         "barryvdh/laravel-snappy": "^1.0",
+        "carlos-meneses/laravel-mpdf": "^2.1",
+        "h4cc/wkhtmltoimage-amd64": "0.12.x",
+        "h4cc/wkhtmltopdf-amd64": "0.12.x",
         "laravel/framework": "^11.9",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
+        "mpdf/mpdf": "^8.2",
         "tymon/jwt-auth": "^2.1"
     },
     "require-dev": {

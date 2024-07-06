@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 use Barryvdh\Snappy\Facades\SnappyPdf as PDF;
+
 use Carbon\Carbon;
 
 class FichaController extends Controller
@@ -237,6 +238,8 @@ class FichaController extends Controller
 
     /**
      * Generar ficha de reparación.
+     * @param string $id_ficha
+     * @return \Illuminate\Http\Response
      */
     public function generarPdfFicha(string $id_ficha)
     {
@@ -251,21 +254,14 @@ class FichaController extends Controller
         $reparaciones = $datos_ficha["reparaciones"];
         $rp = Reparacion::all()->toArray();
 
-        // return view(
-        //     "ficha",
-        //     compact("datos_ficha", "cliente", "vehiculo", "reparaciones", "rp"),
-        // );
-        // var_dump($reparaciones);
-        // die();
-
-        $pdf = PDF::loadView(
+        $pdf = PDF::setOptions([
+            "enable-local-file-access" => true,
+        ])->loadView(
             "ficha",
             compact("datos_ficha", "cliente", "vehiculo", "reparaciones", "rp"),
-        )->setPaper("a4");
-        $pdf->setOption("enable-local-file-access", true);
-        return $pdf->inline("invoice.pdf");
+        );
 
-        return $pdf->download("filename.pdf");
+        return $pdf->inline("invoice.pdf");
     }
 
     /**

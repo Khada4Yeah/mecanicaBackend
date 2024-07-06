@@ -50,16 +50,6 @@
             font-size: 28pt;
         }
 
-        .watermark {
-            position: absolute;
-            top: 30%;
-            left: 15%;
-            opacity: 0.1;
-            width: 70%;
-            height: auto;
-            z-index: 1;
-        }
-
         .no-border {
             border-top: none;
         }
@@ -72,8 +62,6 @@
 </head>
 
 <body>
-
-    <img src="{{ public_path('images/logo_2.png') }}" alt="Marca de Agua" class="watermark">
 
     <table>
         <thead>
@@ -217,8 +205,6 @@
                     <td colspan="3" style="border:none;">&nbsp;</td>
                 </tr>
             @endif
-
-
 
             <tr>
                 <td class="fila-subtitulo no-border" colspan="3">
