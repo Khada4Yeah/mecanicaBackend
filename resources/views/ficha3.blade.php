@@ -1,21 +1,16 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Ficha PDF</title>
-    <style>
-        @page {
-            size: A4;
-            margin: 1cm;
-        }
+    <title>Document</title>
 
+    <style>
         body {
             font-family: sans-serif;
-            margin: 0;
-            padding: 1cm;
+            position: relative;
         }
 
         table {
@@ -31,13 +26,6 @@
             text-align: left;
         }
 
-        .fila-subtitulo {
-            background-color: dimgrey;
-            text-align: center;
-            font-size: 16pt;
-            column-span: 3;
-        }
-
         .header-cell img {
             float: left;
         }
@@ -50,18 +38,43 @@
             font-size: 28pt;
         }
 
-        .no-border {
-            border-top: none;
+        .fila-subtitulo {
+            background-color: dimgrey;
+            text-align: center;
+            font-size: 16pt;
+            column-span: 3;
         }
 
         .bloque-linea {
             display: inline-block;
             width: 50%;
         }
+
+        .no-border {
+            border-top: none;
+        }
+
+        .watermark {
+            position: absolute;
+            margin: 0;
+            padding: 0;
+            opacity: 0.1;
+            z-index: 1;
+            width: 18cm;
+            height: 20cm;
+            top: 66mm;
+            left: 2cm
+        }
+
+        .nueva-pagina {
+            page-break-before: always;
+        }
     </style>
 </head>
 
+
 <body>
+    <img src="{{ public_path('images/logo_2.png') }}" alt="Marca de Agua" class="watermark">
 
     <table>
         <thead>
@@ -161,7 +174,7 @@
                 @foreach ($rp as $r)
                     <tr>
                         <td style="width: 55%">{{ $r['tipo_reparacion'] }}</td>
-                        <td style="text-align: center;">
+                        <td style="text-align: center; width:5%">
                             @foreach ($reparaciones as $re)
                                 @if ($r['id_reparacion'] === $re['id_reparacion'])
                                     <b>X</b>
@@ -190,20 +203,6 @@
                         </td>
                     </tr>
                 @endforeach
-
-                <!-- Add empty rows here to create space before Observations -->
-                <tr>
-                    <td colspan="3" style="border:none;">&nbsp;</td>
-                </tr>
-                <tr>
-                    <td colspan="3" style="border:none;">&nbsp;</td>
-                </tr>
-                <tr>
-                    <td colspan="3" style="border:none;">&nbsp;</td>
-                </tr>
-                <tr>
-                    <td colspan="3" style="border:none;">&nbsp;</td>
-                </tr>
             @endif
 
             <tr>
@@ -220,6 +219,7 @@
             </tr>
         </tbody>
     </table>
+
 
 </body>
 

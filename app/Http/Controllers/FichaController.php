@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Validator;
 
 use Barryvdh\Snappy\Facades\SnappyPdf as PDF;
 
+use mikehaertl\pdftk\Pdf as PdfTk;
+
 use Carbon\Carbon;
 
 class FichaController extends Controller
@@ -243,6 +245,7 @@ class FichaController extends Controller
      */
     public function generarPdfFicha(string $id_ficha)
     {
+        // return view("marcaDeAgua", compact("id_ficha"));
         $datos_ficha = Ficha::with("vehiculo.cliente.usuario", "reparaciones")
             ->where("id_ficha", $id_ficha)
             ->first();
@@ -253,15 +256,48 @@ class FichaController extends Controller
         $vehiculo = $datos_ficha["vehiculo"];
         $reparaciones = $datos_ficha["reparaciones"];
         $rp = Reparacion::all()->toArray();
+        $ruta_logo = base_path("public\images\logo_2.png");
+        $ruta_logo = str_replace("\\", "/", $ruta_logo);
 
-        $pdf = PDF::setOptions([
-            "enable-local-file-access" => true,
-        ])->loadView(
-            "ficha2",
-            compact("datos_ficha", "cliente", "vehiculo", "reparaciones", "rp"),
-        );
+        try {
+            $pdf = PDF::setOptions([
+                "enable-local-file-access" => true,
+                "debug-javascript" => true,
+                "no-pdf-compression" => true,
+                "margin-top" => "15mm",
+                "margin-bottom" => "15mm",
+                "margin-left" => "15mm",
+                "margin-right" => "15mm",
+            ])->loadView(
+                "ficha3",
+                compact(
+                    "datos_ficha",
+                    "cliente",
+                    "vehiculo",
+                    "reparaciones",
+                    "rp",
+                    "ruta_logo",
+                ),
+            );
+            return $pdf->inline("invoice.pdf");
+        } catch (\Exception $e) {
+            return response()->json(
+                [
+                    "status" => "error",
+                    "message" => "Error al generar el PDF",
+                    "errors" => $e,
+                ],
+                400,
+            );
+        }
+    }
 
-        return $pdf->inline("invoice.pdf");
+    /**
+     *
+     *
+     */
+    public function agregarMarcadeAgua()
+    {
     }
 
     /**

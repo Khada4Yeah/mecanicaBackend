@@ -31,11 +31,11 @@ return [
     |    The environment variables to set while running the wkhtmltopdf process.
     |
     */
-
     "pdf" => [
         "enabled" => true,
-        "binary" => base_path(
-            "vendor/h4cc/wkhtmltopdf-amd64/bin/wkhtmltopdf-amd64",
+        "binary" => env(
+            "WKHTML_PDF_BINARY",
+            '"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf"',
         ),
         "timeout" => false,
         "options" => [],
@@ -44,8 +44,9 @@ return [
 
     "image" => [
         "enabled" => true,
-        "binary" => base_path(
-            "vendor/h4cc/wkhtmltopdf-amd64/bin/wkhtmltoimage-amd64",
+        "binary" => env(
+            "WKHTML_IMG_BINARY",
+            '"C:\Program Files\wkhtmltopdf\bin\wkhtmltoimage"',
         ),
         "timeout" => false,
         "options" => [],
