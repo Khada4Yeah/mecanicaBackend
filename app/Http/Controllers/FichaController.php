@@ -256,27 +256,23 @@ class FichaController extends Controller
         $vehiculo = $datos_ficha["vehiculo"];
         $reparaciones = $datos_ficha["reparaciones"];
         $rp = Reparacion::all()->toArray();
-        $ruta_logo = base_path("public\images\logo_2.png");
-        $ruta_logo = str_replace("\\", "/", $ruta_logo);
 
         try {
             $pdf = PDF::setOptions([
                 "enable-local-file-access" => true,
-                "debug-javascript" => true,
                 "no-pdf-compression" => true,
                 "margin-top" => "15mm",
                 "margin-bottom" => "15mm",
                 "margin-left" => "15mm",
                 "margin-right" => "15mm",
             ])->loadView(
-                "ficha3",
+                "ficha",
                 compact(
                     "datos_ficha",
                     "cliente",
                     "vehiculo",
                     "reparaciones",
                     "rp",
-                    "ruta_logo",
                 ),
             );
             return $pdf->inline("invoice.pdf");
@@ -290,14 +286,6 @@ class FichaController extends Controller
                 400,
             );
         }
-    }
-
-    /**
-     *
-     *
-     */
-    public function agregarMarcadeAgua()
-    {
     }
 
     /**
