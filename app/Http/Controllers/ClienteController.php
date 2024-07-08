@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Cliente;
 use App\Models\Usuario;
-
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
@@ -12,13 +11,16 @@ use Illuminate\Validation\Rule;
 
 class ClienteController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware("auth:api", ["except" => ["login"]]);
+    }
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $clientes = Cliente::with("usuario")->get();
-        return response()->json($clientes);
+        return response()->json(Cliente::with("usuario")->get());
     }
 
     /**
@@ -26,36 +28,7 @@ class ClienteController extends Controller
      */
     public function store(Request $request)
     {
-        $params_array = $request->json()->all();
-        $validar_datos = $this->validarDatosCliente($params_array);
-
-        if ($validar_datos->fails()) {
-            return $this->respuestaErrorValidacion($validar_datos);
-        }
-
-        try {
-            DB::beginTransaction();
-            $usuario = $this->crearUsuario($params_array);
-            DB::commit();
-
-            return response()->json(
-                [
-                    "status" => "success",
-                    "message" => "Datos guardados correctamente",
-                ],
-                201,
-            );
-        } catch (\Throwable $th) {
-            DB::rollBack();
-            return response()->json(
-                [
-                    "status" => "error",
-                    "message" => "Error al guardar los datos",
-                    "errors" => $th,
-                ],
-                400,
-            );
-        }
+        return $this->guardarActualizarCliente($request);
     }
 
     /**
@@ -65,17 +38,12 @@ class ClienteController extends Controller
     {
         $cliente = Cliente::with("usuario")->find($id_cliente);
 
-        if (is_object($cliente)) {
-            return response()->json($cliente);
-        } else {
-            return response()->json(
-                [
-                    "status" => "error",
-                    "message" => "Cliente no encontrado",
-                ],
+        return $cliente
+            ? response()->json($cliente)
+            : response()->json(
+                ["status" => "error", "message" => "Cliente no encontrado"],
                 404,
             );
-        }
     }
 
     /**
@@ -83,7 +51,34 @@ class ClienteController extends Controller
      */
     public function update(Request $request, int $id_usuario)
     {
+        return $this->guardarActualizarCliente($request, $id_usuario);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Cliente $cliente)
+    {
+        // Implementar lógica de eliminación si es necesario
+    }
+
+    /**
+     * Guardar o actualizar un cliente.
+     */
+    private function guardarActualizarCliente(
+        Request $request,
+        int $id_usuario = null,
+    ) {
         $params_array = $request->json()->all();
+
+        if (empty($params_array)) {
+            return response()->json(
+                ["status" => "error", "message" => "Error al enviar los datos"],
+                400,
+            );
+        }
+
+        $params_array = array_map("trim", $params_array);
         $validar_datos = $this->validarDatosCliente($params_array, $id_usuario);
 
         if ($validar_datos->fails()) {
@@ -92,15 +87,26 @@ class ClienteController extends Controller
 
         try {
             DB::beginTransaction();
-            $usuario = $this->actualizarUsuario($params_array, $id_usuario);
+            $usuario = $id_usuario ? Usuario::find($id_usuario) : new Usuario();
+
+            if (!$usuario) {
+                return response()->json(
+                    ["status" => "error", "message" => "Usuario no encontrado"],
+                    404,
+                );
+            }
+
+            $this->llenarDatosUsuario($usuario, $params_array);
+            $usuario->save();
+
             DB::commit();
 
+            $message = $id_usuario
+                ? "Datos actualizados correctamente"
+                : "Datos guardados correctamente";
             return response()->json(
-                [
-                    "status" => "success",
-                    "message" => "Datos actualizados correctamente",
-                ],
-                200,
+                ["status" => "success", "message" => $message],
+                $id_usuario ? 200 : 201,
             );
         } catch (\Throwable $th) {
             DB::rollBack();
@@ -113,14 +119,6 @@ class ClienteController extends Controller
                 400,
             );
         }
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Cliente $cliente)
-    {
-        //
     }
 
     /**
@@ -144,10 +142,6 @@ class ClienteController extends Controller
                 "El correo electrónico ya está registrado",
         ];
 
-        // LIMPIAR DATOS
-        $params_array = array_map("trim", $params_array);
-
-        // VALIDAR DATOS
         return Validator::make(
             $params_array,
             [
@@ -171,11 +165,10 @@ class ClienteController extends Controller
     }
 
     /**
-     * Crear un nuevo usuario.
+     * Llenar datos de usuario.
      */
-    private function crearUsuario(array $params_array)
+    private function llenarDatosUsuario(Usuario $usuario, array $params_array)
     {
-        $usuario = new Usuario();
         $usuario->cedula = $params_array["cedula"];
         $usuario->nombres = mb_strtoupper($params_array["nombres"]);
         $usuario->apellido_p = empty($params_array["apellido_p"])
@@ -186,34 +179,6 @@ class ClienteController extends Controller
             : mb_strtoupper($params_array["apellido_m"]);
         $usuario->celular = $params_array["celular"];
         $usuario->correo_electronico = $params_array["correo_electronico"];
-        $usuario->save();
-
-        return $usuario;
-    }
-
-    /**
-     * Actualizar un usuario existente.
-     */
-    private function actualizarUsuario(array $params_array, int $id_usuario)
-    {
-        $usuario = Usuario::where("id_usuario", $id_usuario)->first();
-
-        if (!$usuario) {
-            abort(404, "Usuario no encontrado");
-        }
-
-        $usuario->nombres = mb_strtoupper($params_array["nombres"]);
-        $usuario->apellido_p = empty($params_array["apellido_p"])
-            ? null
-            : mb_strtoupper($params_array["apellido_p"]);
-        $usuario->apellido_m = empty($params_array["apellido_m"])
-            ? null
-            : mb_strtoupper($params_array["apellido_m"]);
-        $usuario->celular = $params_array["celular"];
-        $usuario->correo_electronico = $params_array["correo_electronico"];
-        $usuario->save();
-
-        return $usuario;
     }
 
     /**

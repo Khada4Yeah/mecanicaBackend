@@ -13,18 +13,7 @@ class Ficha extends Model
     protected $primaryKey = "id_ficha";
     public $timestamps = false;
 
-    protected $fillable = [
-        "numero_ficha",
-        "fecha",
-        "otros",
-        "id_cliente",
-        "id_vehiculo",
-    ];
-
-    public function cliente()
-    {
-        return $this->belongsTo(Cliente::class, "id_cliente", "id_cliente");
-    }
+    protected $fillable = ["numero_ficha", "fecha", "otros", "id_vehiculo"];
 
     public function vehiculo()
     {

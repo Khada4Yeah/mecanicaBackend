@@ -1,21 +1,16 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Ficha</title>
-    <style>
-        @page {
-            size: A4;
-            margin: 1cm;
-        }
+    <title>Document</title>
 
+    <style>
         body {
             font-family: sans-serif;
-            margin: 0;
-            padding: 1cm;
+            position: relative;
         }
 
         table {
@@ -31,37 +26,54 @@
             text-align: left;
         }
 
-        .header-cell {
-            position: relative;
-            text-align: center;
-            font-size: 18px;
-        }
-
         .header-cell img {
-            position: absolute;
-            padding: 0;
-            margin: 0
+            float: left;
         }
 
         .header-cell h1 {
-            margin: 1;
+            text-align: center;
+            vertical-align: middle;
+            line-height: 90px;
+            margin: 0 2.45cm 0 0;
+            font-size: 28pt;
+        }
+
+        .fila-subtitulo {
+            background-color: dimgrey;
+            text-align: center;
+            font-size: 16pt;
+            column-span: 3;
+        }
+
+        .bloque-linea {
             display: inline-block;
+            width: 50%;
+        }
+
+        .no-border {
+            border-top: none;
         }
 
         .watermark {
             position: absolute;
-            top: 30%;
-            left: 15%;
+            margin: 0;
+            padding: 0;
             opacity: 0.1;
-            width: 70%;
-            height: auto;
             z-index: 1;
+            width: 18cm;
+            height: 20cm;
+            top: 66mm;
+            left: 2cm
+        }
+
+        .nueva-pagina {
+            page-break-before: always;
         }
     </style>
 </head>
 
-<body>
 
+<body>
     <img src="{{ public_path('images/logo_2.png') }}" alt="Marca de Agua" class="watermark">
 
     <table>
@@ -69,7 +81,7 @@
             <tr>
                 <th colspan="3" class="header-cell">
                     <img src="{{ public_path('images/logo_2.png') }}" alt="Logo" width="100" height="90">
-                    <h1>Mécanica Automotríz Espinoza</h1>
+                    <h1>Mecánica Automotríz Espinoza</h1>
                 </th>
             </tr>
         </thead>
@@ -84,101 +96,130 @@
                 <td colspan="2"><b>Fecha de mantenimiento:</b> {{ $datos_ficha['fecha'] }}</td>
             </tr>
             <tr>
-                <td style="background-color: dimgrey; text-align: center; font-size: 16pt" colspan="3">
+                <td class="fila-subtitulo" colspan="3">
                     <b>DATOS DEL CLIENTE</b>
                 </td>
             </tr>
             <tr>
-                <td><b>Nombres:</b></td>
-                <td colspan="2">
-                    {{ $cliente['nombres'] . ' ' . $cliente['apellido_p'] . ' ' . $cliente['apellido_m'] }}</td>
+                <td colspan="3">
+                    <b>Nombres:</b>
+                    {{ $cliente['nombres'] . ' ' . $cliente['apellido_p'] . ' ' . $cliente['apellido_m'] }}
+                </td>
+
             </tr>
             <tr>
-                <td><b>Cédula:</b></td>
-                <td colspan="2">{{ $cliente['cedula'] }}</td>
+                <td colspan="3">
+                    <b>Cédula:</b>
+                    <div style="display: inline-block; margin-left: 12px">{{ $cliente['cedula'] }}</div>
+                </td>
+
             </tr>
             <tr>
-                <td><b>Contacto:</b></td>
-                <td colspan="2">{{ $cliente['celular'] }}</td>
+                <td colspan="4"> <b>Contacto:</b>
+                    <div style="display: inline-block">{{ $cliente['celular'] }}</div>
+
+                </td>
             </tr>
             <tr>
-                <td><b>Correo:</b></td>
-                <td colspan="2">{{ $cliente['correo_electronico'] }}</td>
+                <td colspan="3"><b>Correo:</b>
+                    <div style="display: inline-block; margin-left: 14px">{{ $cliente['correo_electronico'] }}</div>
+                </td>
             </tr>
             <tr>
-                <td style="background-color: dimgrey; text-align: center; font-size: 16pt" colspan="3">
+                <td class="fila-subtitulo" colspan="3">
                     <b>DATOS DEL VEHÍCULO</b>
                 </td>
             </tr>
             <tr>
-                <td><b>Placa:</b></td>
-                <td colspan="2">{{ $vehiculo['placa'] }}</td>
+                <td colspan="3">
+                    <div class="bloque-linea">
+                        <b>Placa:</b>
+                        <div style="display: inline-block; margin-left: 25px">{{ $vehiculo['placa'] }}</div>
+                    </div>
+                    <div style="display: inline-block">
+                        <b>Chasis:</b>
+                        {{ $vehiculo['chasis'] }}
+                    </div>
+                </td>
             </tr>
             <tr>
-                <td><b>Marca:</b></td>
-                <td colspan="2">{{ $vehiculo['marca'] }}</td>
+                <td colspan="3">
+                    <div class="bloque-linea">
+                        <b>Marca:</b>
+                        <div style="display: inline-block; margin-left: 20px">{{ $vehiculo['marca'] }}</div>
+                    </div>
+                    <div style="display: inline-block">
+                        <b>Motor:</b>
+                        <div style="display: inline-block; margin-left: 6px">
+                            {{ $vehiculo['motor'] }}
+                        </div>
+                    </div>
+                </td>
             </tr>
             <tr>
-                <td><b>Modelo:</b></td>
-                <td colspan="2">{{ $vehiculo['modelo'] }}</td>
+                <td colspan="3">
+                    <b>Modelo:</b>
+                    <div style="display: inline-block; margin-left: 12px">{{ $vehiculo['modelo'] }}</div>
+                </td>
             </tr>
 
+
             <tr>
-                <td style="background-color: dimgrey; text-align: center; font-size: 16pt" colspan="3">
+                <td class="fila-subtitulo" colspan="3">
                     <b>REPARACIONES REALIZADAS</b>
                 </td>
             </tr>
 
-            @foreach ($rp as $r)
-                <tr>
-                    <td>{{ $r['tipo_reparacion'] }}</td>
-                    <td style="text-align: center">
-                        @foreach ($reparaciones as $re)
-                            @if ($r['id_reparacion'] === $re['id_reparacion'])
-                                <b>X</b>
-                            @endif
-                        @endforeach
+            @if (count($reparaciones) !== 0)
+                @foreach ($rp as $r)
+                    <tr>
+                        <td style="width: 55%">{{ $r['tipo_reparacion'] }}</td>
+                        <td style="text-align: center; width:5%">
+                            @foreach ($reparaciones as $re)
+                                @if ($r['id_reparacion'] === $re['id_reparacion'])
+                                    <b>X</b>
+                                @endif
+                            @endforeach
+                        </td>
+                        <td>
+                            @foreach ($reparaciones as $re)
+                                @if ($r['id_reparacion'] === $re['id_reparacion'])
+                                    @if (in_array($re['id_reparacion'], [4, 9, 13, 14, 15]))
+                                        Km. Actual:
+                                        {{ $re['pivot']['informacion_adicional']['kilometraje_actual'] }} - Km.
+                                        Sig.:
+                                        {{ $re['pivot']['informacion_adicional']['kilometraje_siguiente'] }}
+                                    @elseif ($re['id_reparacion'] === 23)
+                                        @foreach ($re['pivot']['informacion_adicional']['ruedas'] as $rueda)
+                                            {{ $rueda . ' ' }}
+                                        @endforeach
+                                    @elseif (in_array($re['id_reparacion'], [24, 25, 26]))
+                                        @foreach ($re['pivot']['informacion_adicional']['zona'] as $zona)
+                                            {{ $zona . ' ' }}
+                                        @endforeach
+                                    @endif
+                                @endif
+                            @endforeach
+                        </td>
+                    </tr>
+                @endforeach
+            @endif
 
-                    </td>
-
-                    <td>
-                        @foreach ($reparaciones as $re)
-                            @if (
-                                $r['id_reparacion'] === $re['id_reparacion'] &&
-                                    ($re['id_reparacion'] === 4 ||
-                                        $re['id_reparacion'] === 9 ||
-                                        $re['id_reparacion'] === 13 ||
-                                        $re['id_reparacion'] === 14 ||
-                                        $re['id_reparacion'] === 15))
-                                Kilometraje Actual:
-                                {{ $re['pivot']['informacion_adicional']['kilometraje_actual'] . ' - Kilometraje Sig.:' . $re['pivot']['informacion_adicional']['kilometraje_actual'] }}
-                            @elseif ($r['id_reparacion'] === $re['id_reparacion'] && $re['id_reparacion'] === 23)
-                                @foreach ($re['pivot']['informacion_adicional']['ruedas'] as $rueda)
-                                    {{ $rueda . ' ' }}
-                                @endforeach
-                            @endif
-                        @endforeach
-                    </td>
-
-                </tr>
-            @endforeach
             <tr>
-                <td style="background-color: dimgrey; text-align: center; font-size: 16pt" colspan="3">
+                <td class="fila-subtitulo no-border" colspan="3">
                     <b>OBSERVACIONES</b>
                 </td>
             </tr>
-
             <tr>
                 @if ($datos_ficha['otros'] != null)
-                    <td colspan="3">{{ $datos_ficha['otros'] }}</td>
+                    <td colspan="3" style="white-space: pre-line;">{{ $datos_ficha['otros'] }}</td>
                 @else
                     <td colspan="3">Sin observaciones...</td>
                 @endif
             </tr>
-
-
         </tbody>
     </table>
+
 
 </body>
 

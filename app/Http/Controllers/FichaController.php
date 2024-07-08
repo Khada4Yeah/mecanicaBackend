@@ -11,6 +11,10 @@ use Illuminate\Support\Facades\Validator;
 
 use Barryvdh\Snappy\Facades\SnappyPdf as PDF;
 
+use mikehaertl\pdftk\Pdf as PdfTk;
+
+use Carbon\Carbon;
+
 class FichaController extends Controller
 {
     /**
@@ -18,7 +22,7 @@ class FichaController extends Controller
      */
     public function index()
     {
-        $fichas = Ficha::with("cliente.usuario", "vehiculo")->get();
+        $fichas = Ficha::with("vehiculo")->get();
         return response()->json($fichas, 200);
     }
 
@@ -30,14 +34,15 @@ class FichaController extends Controller
         $ficha_request = $request->input("ficha", []);
         $reparaciones_request = $request->input("reparaciones", []);
 
-        if (!empty($ficha_request) && !empty($reparaciones_request)) {
+        if (
+            !empty($ficha_request) &&
+            (!empty($reparaciones_request) || $ficha_request["otros"] !== null)
+        ) {
             // LIMPIAR DATOS
             $ficha_request = array_map("trim", $ficha_request);
             //$reparaciones_request = array_map("trim", $reparaciones_request);
 
             $mensajes = [
-                "id_cliente.required" => "El cliente es requerido",
-                "id_cliente.exists" => "El cliente no existe",
                 "id_vehiculo.required" => "El vehículo es requerido",
                 "id_vehiculo.exists" => "El vehículo no existe",
             ];
@@ -46,7 +51,6 @@ class FichaController extends Controller
             $validar_ficha = Validator::make(
                 $ficha_request,
                 [
-                    "id_cliente" => "required|exists:clientes,id_cliente",
                     "id_vehiculo" => "required|exists:vehiculos,id_vehiculo",
                 ],
                 $mensajes,
@@ -94,9 +98,10 @@ class FichaController extends Controller
                 // CREAR LA FICHA
                 $ficha = new Ficha();
                 $ficha->numero_ficha = 0;
-                $ficha->fecha = date("Y-m-d");
+                $ficha->fecha = empty($ficha_request["fecha"])
+                    ? date("Y-m-d")
+                    : $this->formatearFecha($ficha_request["fecha"]);
                 $ficha->otros = $ficha_request["otros"] ?? null;
-                $ficha->id_cliente = $ficha_request["id_cliente"];
                 $ficha->id_vehiculo = $ficha_request["id_vehiculo"];
 
                 // GUARDAR EL USUARIO
@@ -158,7 +163,7 @@ class FichaController extends Controller
     public function show(string $parametro)
     {
         //Consultar las fichas con el cliente, datos de usuario, vehiculo y las reparaciones
-        $ficha = Ficha::with("cliente.usuario", "vehiculo", "reparaciones")
+        $ficha = Ficha::with("vehiculo", "reparaciones")
             ->where("id_ficha", $parametro)
             ->first();
         return response()->json($ficha, 200);
@@ -181,58 +186,90 @@ class FichaController extends Controller
     }
 
     /**
-     * Consultar las fichas de un cliente.
+     * Consultar las fichas de un un vehículo de un cliente.
+     * @param int $id_vehiculo
+     * @return \Illuminate\Http\Response
      */
-    public function fichasCliente(string $parametro)
+    public function fichasClienteVehiculo(int $id_vehiculo)
     {
-        // Realiza la búsqueda condicional
-        $fichas = Ficha::with("cliente.usuario", "vehiculo")
-            ->whereHas("cliente.usuario", function ($q) use ($parametro) {
-                $q->where("cedula", $parametro);
-            })
-            ->orWhereHas("vehiculo", function ($q) use ($parametro) {
-                $q->where("placa", $parametro);
-            })
-            ->orderBy("fecha", "desc")
+        $fichas = Ficha::with("vehiculo.cliente.usuario")
+            ->where("id_vehiculo", $id_vehiculo)
             ->get();
 
-        // Retorna los resultados como JSON
+        $fichas = $fichas->map(function ($ficha) {
+            $vehiculo = $ficha->vehiculo;
+            $cliente = $vehiculo->cliente;
+            $usuario = $cliente->usuario;
+
+            // Eliminar el cliente de la relación del vehículo
+            unset($vehiculo->cliente);
+
+            return [
+                "id_ficha" => $ficha->id_ficha,
+                "numero_ficha" => $ficha->numero_ficha,
+                "fecha" => $ficha->fecha,
+                "otros" => $ficha->otros,
+                "id_vehiculo" => $ficha->id_vehiculo,
+                "vehiculo" => $vehiculo,
+                "cliente" => [
+                    "id_cliente" => $cliente->id_cliente,
+                    "id_usuario" => $cliente->id_usuario,
+                    "usuario" => $usuario,
+                ],
+            ];
+        });
+
         return response()->json($fichas, 200);
     }
 
     /**
      * Generar ficha de reparación.
+     * @param string $id_ficha
+     * @return \Illuminate\Http\Response
      */
     public function generarPdfFicha(string $id_ficha)
     {
-        $datos_ficha = Ficha::with(
-            "cliente.usuario",
-            "vehiculo",
-            "reparaciones",
-        )
+        // return view("marcaDeAgua", compact("id_ficha"));
+        $datos_ficha = Ficha::with("vehiculo.cliente.usuario", "reparaciones")
             ->where("id_ficha", $id_ficha)
             ->first();
 
         $datos_ficha = $datos_ficha->toArray();
 
-        $cliente = $datos_ficha["cliente"]["usuario"];
+        $cliente = $datos_ficha["vehiculo"]["cliente"]["usuario"];
         $vehiculo = $datos_ficha["vehiculo"];
         $reparaciones = $datos_ficha["reparaciones"];
         $rp = Reparacion::all()->toArray();
 
-        // return view(
-        //     "ficha",
-        //     compact("datos_ficha", "cliente", "vehiculo", "reparaciones", "rp"),
-        // );
-        // var_dump($reparaciones);
-        // die();
-
-        $pdf = PDF::loadView(
-            "ficha",
-            compact("datos_ficha", "cliente", "vehiculo", "reparaciones", "rp"),
-        );
-        $pdf->setOption("enable-local-file-access", true);
-        return $pdf->inline("invoice.pdf");
+        try {
+            $pdf = PDF::setOptions([
+                "enable-local-file-access" => true,
+                "no-pdf-compression" => true,
+                "margin-top" => "15mm",
+                "margin-bottom" => "15mm",
+                "margin-left" => "15mm",
+                "margin-right" => "15mm",
+            ])->loadView(
+                "ficha",
+                compact(
+                    "datos_ficha",
+                    "cliente",
+                    "vehiculo",
+                    "reparaciones",
+                    "rp",
+                ),
+            );
+            return $pdf->inline("invoice.pdf");
+        } catch (\Exception $e) {
+            return response()->json(
+                [
+                    "status" => "error",
+                    "message" => "Error al generar el PDF",
+                    "errors" => $e,
+                ],
+                400,
+            );
+        }
     }
 
     /**
@@ -262,6 +299,14 @@ class FichaController extends Controller
                     "ruedas.*" => "in:DI, DD, TI, TD",
                 ];
                 break;
+            case 24: // Cambio de pastillas de freno
+            case 25: // Limpieza de mordazas de freno
+            case 26: // Cambio de amortiguadores
+                $rules = [
+                    "zona" => "required|array",
+                    "zona.*" => "in:FRENTE, POSTERIOR",
+                ];
+                break;
         }
 
         $mensajes = [
@@ -276,8 +321,27 @@ class FichaController extends Controller
             "ruedas.required" => "Las ruedas son requeridas",
             "ruedas.*.in" =>
                 "Las ruedas deben ser DI, DD, TI o TD (delantera izquierda, delantera derecha, trasera izquierda, trasera derecha)",
+            "zona.required" => "La zona es requerida",
+            "zona.*.in" => "La zona debe ser FRENTE o POSTERIOR",
         ];
 
         return Validator::make($informacion_adicional, $rules, $mensajes);
+    }
+
+    /**
+     * Formatear fecha.
+     *
+     * @param string $fecha
+     * @return string
+     */
+    private function formatearFecha(string $fecha)
+    {
+        // Crear un objeto Carbon a partir de la cadena de fecha
+        $date = Carbon::parse($fecha);
+
+        // Formatear la fecha en el formato yyyy-MM-dd
+        $formattedDate = $date->format("Y-m-d");
+
+        return $formattedDate;
     }
 }

@@ -16,11 +16,6 @@ return new class extends Migration {
             $table->date("fecha");
             $table->text("otros")->nullable();
 
-            $table->bigInteger("id_cliente");
-            $table
-                ->foreign("id_cliente")
-                ->references("id_cliente")
-                ->on("clientes");
             $table->bigInteger("id_vehiculo");
             $table
                 ->foreign("id_vehiculo")
