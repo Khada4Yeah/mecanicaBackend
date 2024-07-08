@@ -81,7 +81,7 @@
             <tr>
                 <th colspan="3" class="header-cell">
                     <img src="{{ public_path('images/logo_2.png') }}" alt="Logo" width="100" height="90">
-                    <h1>Mécanica Automotríz Espinoza</h1>
+                    <h1>Mecánica Automotríz Espinoza</h1>
                 </th>
             </tr>
         </thead>

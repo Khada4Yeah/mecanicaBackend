@@ -65,14 +65,17 @@ Route::apiResource("reparaciones", ReparacionController::class)->middleware(
 //** API de fichas */
 Route::apiResource("fichas", FichaController::class)->middleware("auth:api");
 
-//** Ruta para obtener las fichas de un cliente */
-Route::get("fichas/cliente/{parametro}", [
+//** Ruta para obtener las fichas de un cliente para un vehículo */
+Route::get("fichas/cliente/vehiculo/{id_vehiculo}", [
     FichaController::class,
-    "fichasCliente",
+    "fichasClienteVehiculo",
 ])->middleware("auth:api");
 
 //** Ruta para generar el PDF de la ficha */
-Route::get("fichas/pdf/{id}", [FichaController::class, "generarPdfFicha"]);
+Route::get("fichas/pdf/{id}", [
+    FichaController::class,
+    "generarPdfFicha",
+])->middleware("auth:api");
 
 //?? RUTAS DE FICHASREPARACIONES ?/
 //** API de fichasreparaciones */

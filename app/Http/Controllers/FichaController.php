@@ -186,30 +186,14 @@ class FichaController extends Controller
     }
 
     /**
-     * Consultar las fichas de un cliente.
+     * Consultar las fichas de un un vehículo de un cliente.
+     * @param int $id_vehiculo
+     * @return \Illuminate\Http\Response
      */
-    public function fichasCliente(string $parametro)
+    public function fichasClienteVehiculo(int $id_vehiculo)
     {
         $fichas = Ficha::with("vehiculo.cliente.usuario")
-            ->whereHas("vehiculo.cliente.usuario", function ($query) use (
-                $parametro,
-            ) {
-                $query->where("cedula", $parametro);
-            })
-            ->orWhereHas("vehiculo", function ($q) use ($parametro) {
-                $q->where("placa", $parametro);
-            })
-            ->orWhereHas("vehiculo.cliente.usuario", function ($q) use (
-                $parametro,
-            ) {
-                $q->where("apellido_p", "like", "%$parametro%");
-            })
-            ->orWhereHas("vehiculo.cliente.usuario", function ($q) use (
-                $parametro,
-            ) {
-                $q->where("apellido_m", "like", "%$parametro%");
-            })
-            ->orderBy("fecha", "ASC")
+            ->where("id_vehiculo", $id_vehiculo)
             ->get();
 
         $fichas = $fichas->map(function ($ficha) {
