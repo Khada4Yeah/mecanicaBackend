@@ -6,7 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
+<<<<<<< HEAD
     <link rel="stylesheet" href="https://app-mecanica-espinoza-backend-34fc43ce9a1f.herokuapp.com/fonts/stylesheet.css">
+=======
+
+>>>>>>> main
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -189,11 +193,11 @@
                                         {{ $re['pivot']['informacion_adicional']['kilometraje_actual'] }} - Km.
                                         Sig.:
                                         {{ $re['pivot']['informacion_adicional']['kilometraje_siguiente'] }}
-                                    @elseif ($re['id_reparacion'] === 23)
+                                    @elseif ($re['id_reparacion'] === 21)
                                         @foreach ($re['pivot']['informacion_adicional']['ruedas'] as $rueda)
                                             {{ $rueda . ' ' }}
                                         @endforeach
-                                    @elseif (in_array($re['id_reparacion'], [24, 25, 26]))
+                                    @elseif (in_array($re['id_reparacion'], [22, 23, 24]))
                                         @foreach ($re['pivot']['informacion_adicional']['zona'] as $zona)
                                             {{ $zona . ' ' }}
                                         @endforeach

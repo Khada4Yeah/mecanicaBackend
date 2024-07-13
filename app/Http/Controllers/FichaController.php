@@ -11,8 +11,6 @@ use Illuminate\Support\Facades\Validator;
 
 use Barryvdh\Snappy\Facades\SnappyPdf as PDF;
 
-use mikehaertl\pdftk\Pdf as PdfTk;
-
 use Carbon\Carbon;
 
 class FichaController extends Controller
@@ -229,7 +227,6 @@ class FichaController extends Controller
      */
     public function generarPdfFicha(string $id_ficha)
     {
-        // return view("marcaDeAgua", compact("id_ficha"));
         $datos_ficha = Ficha::with("vehiculo.cliente.usuario", "reparaciones")
             ->where("id_ficha", $id_ficha)
             ->first();
@@ -293,15 +290,15 @@ class FichaController extends Controller
                 break;
 
             // Caso específico con reglas diferentes
-            case 23: // Cambio de rulimanes de rueda
+            case 21: // Cambio de rulimanes de rueda
                 $rules = [
                     "ruedas" => "required|array",
                     "ruedas.*" => "in:DI, DD, TI, TD",
                 ];
                 break;
-            case 24: // Cambio de pastillas de freno
-            case 25: // Limpieza de mordazas de freno
-            case 26: // Cambio de amortiguadores
+            case 22: // Cambio de pastillas de freno
+            case 23: // Limpieza de mordazas de freno
+            case 24: // Cambio de amortiguadores
                 $rules = [
                     "zona" => "required|array",
                     "zona.*" => "in:FRENTE, POSTERIOR",
