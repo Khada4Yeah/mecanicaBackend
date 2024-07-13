@@ -6,11 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
-<<<<<<< HEAD
-    <link rel="stylesheet" href="https://app-mecanica-espinoza-backend-34fc43ce9a1f.herokuapp.com/fonts/stylesheet.css">
-=======
-
->>>>>>> main
     <style>
         body {
             font-family: 'Arial', sans-serif;
