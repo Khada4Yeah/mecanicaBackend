@@ -22,20 +22,19 @@ Route::post("administradores/login", [
     AdministradorController::class,
     "login",
 ])->name("login");
+
 Route::post("administradores/validarToken", [
     AdministradorController::class,
     "obtenerUsuarioAutenticado",
 ]);
+
 Route::post("administradores/logout", [
     AdministradorController::class,
     "logout",
 ]);
 
 //** API de administradores */
-Route::apiResource(
-    "administradores",
-    AdministradorController::class,
-)->middleware("auth:api");
+Route::apiResource("administradores", AdministradorController::class);
 
 //?? RUTAS DE CLIENTES ?/
 //** API de clientes */
